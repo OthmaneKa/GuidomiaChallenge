@@ -4,6 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/othma/AndroidStudioProjects/GuidomiaCars/app/src/main/res/layout/activity_main.xml" value="0.18385416666666668" />
+        <entry key="..\:/Users/othma/AndroidStudioProjects/GuidomiaCars/app/src/main/res/layout/card_filter.xml" value="0.33" />
+        <entry key="..\:/Users/othma/AndroidStudioProjects/GuidomiaCars/app/src/main/res/layout/fragment_home.xml" value="0.2" />
+        <entry key="..\:/Users/othma/AndroidStudioProjects/GuidomiaCars/app/src/main/res/layout/header.xml" value="0.18385416666666668" />
       </map>
     </option>
   </component>
