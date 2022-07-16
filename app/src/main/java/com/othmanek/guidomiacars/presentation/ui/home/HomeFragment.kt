@@ -51,7 +51,10 @@ class HomeFragment : Fragment() {
         val jsonFile =
             resources.openRawResource(R.raw.car_list).bufferedReader().use { it.readText() }
         val data = moshiAdapter.fromJson(jsonFile)
-        data?.map { it.setImage() }
+        data?.map {
+            it.setImage()
+            if (data.indexOf(it) == 0) it.isExpanded = true
+        }
         data?.let { mAdapter.updateList(it) }
 
     }

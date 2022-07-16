@@ -2,10 +2,12 @@ package com.othmanek.guidomiacars.presentation.ui.home.list
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.othmanek.guidomiacars.R
@@ -34,6 +36,7 @@ class CarListAdapter : RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
             with(data[position]) {
                 binding.itemCarPrice.text = marketPrice.getPriceToDisplay()
                 binding.itemCarTitle.text = model
+                binding.itemRatingsContainer.removeAllViews()
                 if (rating != 0) {
                     val list = getRatingDrawables(context, rating)
                     list.forEach {
@@ -45,6 +48,22 @@ class CarListAdapter : RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
                 }
 
                 binding.subItemContainer.visibility = if (isExpanded) View.VISIBLE else View.GONE
+                binding.mainContainer.setOnClickListener {
+                    shouldExpandSection(position)
+                }
+                binding.subItemProsContainer.apply {
+                    this.removeAllViews()
+                    for (pros in prosList) {
+                        this.addView(createBulletPoints(pros, context))
+                    }
+                }
+
+                binding.subItemConsContainer.apply {
+                    this.removeAllViews()
+                    for (cons in consList) {
+                        this.addView(createBulletPoints(cons, context))
+                    }
+                }
             }
         }
     }
@@ -82,4 +101,34 @@ class CarListAdapter : RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
         return drawables
     }
 
+    private fun createBulletPoints(content: String, context: Context): TextView {
+        val textView = TextView(context)
+        textView.apply {
+            text = content
+            textSize = 12f
+            gravity = Gravity.CENTER_HORIZONTAL
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.ic_bullet,
+                0,
+                0,
+                0
+            )
+            setTextColor(resources.getColor(R.color.black, null))
+        }
+        return textView
+    }
+
+    private fun shouldExpandSection(position: Int) {
+        data[position].isExpanded = !data[position].isExpanded
+        data.map { it ->
+            if (data.indexOf(it) != position) {
+                it.isExpanded = false
+            }
+        }
+        notifyDataSetChanged()
+    }
 }
