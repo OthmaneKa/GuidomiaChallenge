@@ -3,6 +3,7 @@ package com.othmanek.guidomiacars.presentation.ui.home.list
 import android.content.Context
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
@@ -42,6 +43,8 @@ class CarListAdapter : RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
                 image?.let {
                     binding.itemImageView.setImageDrawable(ContextCompat.getDrawable(context, it))
                 }
+
+                binding.subItemContainer.visibility = if (isExpanded) View.VISIBLE else View.GONE
             }
         }
     }
@@ -78,6 +81,5 @@ class CarListAdapter : RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
         }
         return drawables
     }
-
 
 }
