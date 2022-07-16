@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Guidomia Cars</string>
+    <string name="title_toolbar">GUIDOMIA</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="card_filter_title">Filters</string>
+    <string name="content_description_header">Header imageview</string>
+    <string name="title_pros">Pros :</string>
+    <string name="title_cons">Cons :</string>
 </resources>
