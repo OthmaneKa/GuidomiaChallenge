@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    android:background="@color/gray_light"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/item_image_view"
+        android:layout_width="150dp"
+        android:layout_height="80dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/alpine_roadster" />
+
+    <TextView
+        android:id="@+id/item_car_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/gray_dark"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/item_image_view"
+        app:layout_constraintTop_toTopOf="@id/item_image_view"
+        tools:text="Alpine Roadster" />
+
+    <TextView
+        android:id="@+id/item_car_price"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/gray_dark"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@id/item_car_title"
+        app:layout_constraintStart_toStartOf="@id/item_car_title"
+        app:layout_constraintTop_toBottomOf="@id/item_car_title"
+        tools:text="Price: 120k" />
+
+    <LinearLayout
+        android:id="@+id/item_ratings_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/item_image_view"
+        app:layout_constraintEnd_toEndOf="@id/item_car_title"
+        app:layout_constraintStart_toStartOf="@id/item_car_title">
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/sub_item_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_image_view">
+
+        <TextView
+            android:id="@+id/subItem_pros_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_pros"
+            android:textColor="@color/gray_dark"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/sub_item_container"
+            app:layout_constraintTop_toTopOf="@id/sub_item_container" />
+
+        <LinearLayout
+            android:id="@+id/subItem_pros_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="@id/subItem_pros_title"
+            app:layout_constraintStart_toStartOf="@id/subItem_pros_title"
+            app:layout_constraintTop_toBottomOf="@id/subItem_pros_title">
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/subItem_cons_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/title_cons"
+            android:textColor="@color/gray_dark"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@id/subItem_pros_title"
+            app:layout_constraintStart_toStartOf="@id/sub_item_container"
+            app:layout_constraintTop_toBottomOf="@id/subItem_pros_container" />
+
+        <LinearLayout
+            android:id="@+id/subItem_cons_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="@id/subItem_cons_title"
+            app:layout_constraintStart_toStartOf="@id/subItem_cons_title"
+            app:layout_constraintTop_toBottomOf="@id/subItem_cons_title">
+
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
