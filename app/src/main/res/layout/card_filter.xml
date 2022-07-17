@@ -24,6 +24,8 @@
 
         <Spinner
             android:id="@+id/card_filter_make_spinner"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
+            android:background="@drawable/bg_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
@@ -34,7 +36,8 @@
 
         <Spinner
             android:id="@+id/card_filter_model_spinner"
-            style="@style/Widget.AppCompat.DropDownItem.Spinner"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
+            android:background="@drawable/bg_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
