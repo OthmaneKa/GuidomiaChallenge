@@ -18,6 +18,7 @@ import com.othmanek.guidomiacars.domain.entity.Car
 class CarListAdapter : RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
 
     private var data: List<Car> = emptyList()
+    private var filteredData: List<Car> = emptyList()
 
     inner class ViewHolder(val binding: ItemLayoutBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -33,7 +34,7 @@ class CarListAdapter : RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val context = holder.binding.root.context
         with(holder) {
-            with(data[position]) {
+            with(filteredData[position]) {
                 binding.itemCarPrice.text = marketPrice.getPriceToDisplay()
                 binding.itemCarTitle.text = model
                 binding.itemRatingsContainer.removeAllViews()
@@ -69,11 +70,22 @@ class CarListAdapter : RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return filteredData.size
     }
 
     fun updateList(data: List<Car>) {
         this.data = data
+        filteredData = data
+        notifyDataSetChanged()
+    }
+
+    fun filterList(filterValue: MutableList<String>) {
+        filteredData = data
+        if (filterValue[0].isNotEmpty() && filterValue[1].isEmpty()) {
+            filteredData = filteredData.filter { it.make == filterValue[0] }
+        } else if (filterValue[0].isEmpty() && filterValue[1].isNotEmpty()) {
+            filteredData = filteredData.filter { it.model == filterValue[1] }
+        }
         notifyDataSetChanged()
     }
 

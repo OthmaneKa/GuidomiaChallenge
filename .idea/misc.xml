@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/othma/AndroidStudioProjects/GuidomiaCars/app/src/main/res/drawable/bg_spinner.xml" value="0.191" />
+        <entry key="..\:/Users/othma/AndroidStudioProjects/GuidomiaCars/app/src/main/res/drawable/ic_bullet.xml" value="0.192" />
         <entry key="..\:/Users/othma/AndroidStudioProjects/GuidomiaCars/app/src/main/res/layout/activity_main.xml" value="0.18385416666666668" />
         <entry key="..\:/Users/othma/AndroidStudioProjects/GuidomiaCars/app/src/main/res/layout/card_filter.xml" value="0.33" />
         <entry key="..\:/Users/othma/AndroidStudioProjects/GuidomiaCars/app/src/main/res/layout/fragment_home.xml" value="0.2" />
