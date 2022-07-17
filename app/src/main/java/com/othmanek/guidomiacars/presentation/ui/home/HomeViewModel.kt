@@ -1,62 +1,87 @@
 package com.othmanek.guidomiacars.presentation.ui.home
 
+import android.content.res.Resources
 import androidx.lifecycle.ViewModel
+import com.othmanek.guidomiacars.R
 import com.othmanek.guidomiacars.common.Resource
+import com.othmanek.guidomiacars.data.local.CarDao
 import com.othmanek.guidomiacars.domain.entity.Car
-import com.othmanek.guidomiacars.domain.use_case.GetCarsUseCase
+import com.othmanek.guidomiacars.domain.entity.FilterValue
+import com.squareup.moshi.JsonAdapter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val useCase: GetCarsUseCase
+    private val mAdapter: JsonAdapter<List<Car>>,
+    private val resources: Resources,
+    private val dao: CarDao
 ) : ViewModel() {
 
-    private var _data: Flow<Resource<List<Car>>> = emptyFlow()
-    val data = _data
+    private val filterValue = MutableStateFlow<FilterValue>(FilterValue())
 
-    private val _makeValue: MutableStateFlow<String> = MutableStateFlow("")
-    val makeValue: Flow<String>
-        get() = _makeValue
-
-    private val _modelValue: MutableStateFlow<String> = MutableStateFlow("")
-    val modelValue: Flow<String>
-        get() = _modelValue
+    var makeFilterValues = MutableStateFlow<List<String>>(emptyList())
+    var modelFilterValues = MutableStateFlow<List<String>>(emptyList())
 
     init {
-        getCars()
+        getAllCars()
+        updateModelsFilterValues()
+        updateMakeFilterValues()
     }
 
-    fun getCars(): Flow<Resource<List<Car>>> = flow {
-        try {
-            emit(Resource.Loading())
-            val myData = useCase.getCarsFromLocalJson()
-            if (_modelValue.value.isEmpty() && _makeValue.value.isEmpty()) {
-                emit(Resource.Success(myData))
-            } else if (_modelValue.value.isNotEmpty() && _makeValue.value.isEmpty()) {
-                val filteredData = myData.filter { it.model == _modelValue.value }
-                emit(Resource.Success(filteredData))
-            } else if (_modelValue.value.isEmpty() && _makeValue.value.isNotEmpty()) {
-                val filteredData = myData.filter { it.make == _makeValue.value }
-                emit(Resource.Success(filteredData))
-            } else
-                emit(Resource.Success(emptyList()))
-        } catch (e: Exception) {
-            emit(Resource.Error(e.message.toString()))
+    fun getFilteredList(): Flow<Resource<List<Car>>> = flow {
+        emit(Resource.Loading())
+        if (filterValue.value.makeValue.isEmpty() && filterValue.value.modelValue.isEmpty()) {
+            val data = dao.getAllCars()
+            data.map { it.setImage() }
+            emit(Resource.Success(data))
+        } else {
+            val data =
+                dao.getCarsByParameters(filterValue.value.modelValue, filterValue.value.makeValue)
+            data.map { it.setImage() }
+            emit(Resource.Success(data))
         }
     }
 
-    fun setMakeFilters(data: String) {
-        _makeValue.value = data
-        getCars()
+    private fun getAllCars(): List<Car> {
+        val listOfCars = dao.getAllCars()
+        if (listOfCars.isEmpty()) {
+            val localFile = getCarsFromLocalJson()
+            localFile.forEach { dao.insertCar(it) }
+        }
+        return dao.getAllCars()
     }
 
-    fun setModelFilters(data: String) {
-        _modelValue.value = data
-        getCars()
+    private fun getCarsFromLocalJson(): List<Car> {
+        val jsonFile =
+            resources.openRawResource(R.raw.car_list).bufferedReader().use { it.readText() }
+        val data = mAdapter.fromJson(jsonFile) ?: emptyList()
+        data.map {
+            it.setImage()
+            if (data.indexOf(it) == 0) it.expanded = true
+        }
+        return data
+    }
+
+    private fun updateMakeFilterValues() {
+        val data = dao.getAllMakeExisting()
+        val currentList = data.toMutableList()
+        currentList.add(0, "Any Make")
+        makeFilterValues.value = currentList.toList()
+    }
+
+    private fun updateModelsFilterValues() {
+        val data = dao.getAllModelsExisting()
+        val currentList = data.toMutableList()
+        currentList.add(0, "Any Model")
+        modelFilterValues.value = currentList.toList()
+    }
+
+    fun updateFilterValue(filter: FilterValue) {
+        filterValue.value = filter
+        getFilteredList()
     }
 }

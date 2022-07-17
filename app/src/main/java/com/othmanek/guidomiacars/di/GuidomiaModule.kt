@@ -1,9 +1,12 @@
 package com.othmanek.guidomiacars.di
 
+import android.app.Application
 import android.content.Context
 import android.content.res.Resources
+import androidx.room.Room
+import com.othmanek.guidomiacars.data.local.CarDao
+import com.othmanek.guidomiacars.data.local.CarDatabase
 import com.othmanek.guidomiacars.domain.entity.Car
-import com.othmanek.guidomiacars.domain.use_case.GetCarsUseCase
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -34,10 +37,15 @@ object GuidomiaModule {
 
     @Singleton
     @Provides
-    fun provideCarUseCase(
-        moshiAdapter: JsonAdapter<List<Car>>,
-        resources: Resources
-    ): GetCarsUseCase {
-        return GetCarsUseCase(moshiAdapter, resources)
+    fun provideCarDatabase(application: Application): CarDatabase {
+        return Room.databaseBuilder(application, CarDatabase::class.java, "car_db")
+            .allowMainThreadQueries()
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCarDao(db: CarDatabase): CarDao {
+        return db.carDao
     }
 }

@@ -6,15 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.othmanek.guidomiacars.R
+import com.othmanek.guidomiacars.common.Resource
 import com.othmanek.guidomiacars.databinding.FragmentHomeBinding
 import com.othmanek.guidomiacars.domain.entity.Car
+import com.othmanek.guidomiacars.domain.entity.FilterValue
 import com.othmanek.guidomiacars.presentation.ui.home.list.CarListAdapter
 import com.squareup.moshi.JsonAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -23,8 +29,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var mAdapter: CarListAdapter
     private val viewModel: HomeViewModel by viewModels()
-    private var data: List<Car> = emptyList()
-    private var filterValue = mutableListOf("", "")
+    private var filterValue = FilterValue()
 
     @Inject
     lateinit var moshiAdapter: JsonAdapter<List<Car>>
@@ -44,7 +49,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(binding.root, savedInstanceState)
         initView()
-        getListFromJsonFile()
+
+        collectList()
+        populateSpinners()
         setMakeListener()
         setModelListeners()
     }
@@ -59,31 +66,50 @@ class HomeFragment : Fragment() {
             mAdapter = CarListAdapter()
             adapter = mAdapter
             layoutManager = mLayoutManager
+            val decoration = DividerItemDecoration(context, LinearLayoutManager.VERTICAL)
+            decoration.setDrawable(resources.getDrawable(R.drawable.bg_separator, null))
+            addItemDecoration(decoration)
+        }
+
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        if (isLoading) {
+            binding.progressBar.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+        } else {
+            binding.progressBar.visibility = View.GONE
+            binding.recyclerView.visibility = View.VISIBLE
         }
     }
 
-    private fun getListFromJsonFile() {
-        val makeEntries: MutableList<String> = mutableListOf()
-        val modelEntries: MutableList<String> = mutableListOf()
-
-        val jsonFile =
-            resources.openRawResource(R.raw.car_list).bufferedReader().use { it.readText() }
-        val data = moshiAdapter.fromJson(jsonFile)
-
-        data?.map {
-            it.setImage()
-            if (data.indexOf(it) == 0) it.isExpanded = true
+    private fun collectList() {
+        lifecycleScope.launch {
+            viewModel.getFilteredList().collect() {
+                when (it) {
+                    is Resource.Error -> {
+                        showLoading(false)
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                    is Resource.Loading -> showLoading(true)
+                    is Resource.Success -> {
+                        showLoading(false)
+                        mAdapter.updateList(it.data!!)
+                    }
+                }
+            }
         }
-        this.data = data!!
-        data.let { mAdapter.updateList(it) }
-        data.forEach {
-            makeEntries.add(it.make)
-            modelEntries.add(it.model)
+    }
+
+    private fun populateSpinners() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            launch {
+                viewModel.modelFilterValues.collect { populateModelSpinnerWithEntries(it) }
+            }
+            launch {
+                viewModel.makeFilterValues.collect { populateMakeSpinnerWithEntries(it) }
+            }
         }
-        modelEntries.add(0, "Select a Model")
-        makeEntries.add(0, "Select a Make")
-        populateModelSpinnerWithEntries(modelEntries)
-        populateMakeSpinnerWithEntries(makeEntries)
     }
 
     private fun populateMakeSpinnerWithEntries(entries: List<String>) {
@@ -109,18 +135,18 @@ class HomeFragment : Fragment() {
         binding.filtersContainer.cardFilterMakeSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    if (p2 != 0)
-                        filterValue[0] = data[p2 - 1].make
+                    if (binding.filtersContainer.cardFilterMakeSpinner.selectedItem.toString() != "Any Make")
+                        filterValue.makeValue =
+                            binding.filtersContainer.cardFilterMakeSpinner.selectedItem.toString()
                     else
-                        filterValue[0] = ""
+                        filterValue.makeValue = ""
 
-                    mAdapter.filterList(filterValue)
-
+                    viewModel.updateFilterValue(filterValue)
+                    collectList()
                 }
 
                 override fun onNothingSelected(p0: AdapterView<*>?) {
                 }
-
             }
     }
 
@@ -129,11 +155,13 @@ class HomeFragment : Fragment() {
         binding.filtersContainer.cardFilterModelSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    if (p2 != 0)
-                        filterValue[1] = data[p2 - 1].model
+                    if (binding.filtersContainer.cardFilterModelSpinner.selectedItem.toString() != "Any Model")
+                        filterValue.modelValue =
+                            binding.filtersContainer.cardFilterModelSpinner.selectedItem.toString()
                     else
-                        filterValue[1] = ""
-                    mAdapter.filterList(filterValue)
+                        filterValue.modelValue = ""
+                    viewModel.updateFilterValue(filterValue)
+                    collectList()
                 }
 
                 override fun onNothingSelected(p0: AdapterView<*>?) {
